@@ -1,0 +1,9 @@
+<div class="container">
+    <form action="/reminder/<%= reminderItem.id%>/subtask" method="POST">
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="descriptionInput" rows="3" placeholder="Subtask" name="subtask"></textarea>
+      </div>
+      <button type="add" class="btn btn-default">Add</button>
+    </form>
+  </div>

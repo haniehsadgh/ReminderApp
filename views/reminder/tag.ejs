@@ -1,0 +1,9 @@
+<div class="container">
+    <form action="/reminder/<%= reminderItem.id%>/tag" method="POST">
+      <div class="form-group">
+        <label for="description">Tag name</label>
+        <input type="text" class="form-control" id="taginput" placeholder="Tag name" name="tag">
+      </div>
+      <button type="addtag" class="btn btn-default">Add Tag</button>
+    </form>
+  </div>

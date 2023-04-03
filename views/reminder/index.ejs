@@ -1,0 +1,39 @@
+<div class="container">
+    <h1 class="page-header">Reminders</h1>
+  
+  <ul class="list-group">
+        <% reminders.forEach(function (reminder) { %>
+            <li class="list-group-item">
+                <strong><%= reminder.title %>: </strong>
+                <%= reminder.description %>
+                || Remind me: <%= reminder.date_time %>
+                || Completed:
+                <% if (reminder.completed == true) { %>
+                <span class="label label-success">True</span>
+                <% } else if (reminder.completed == false) { %>
+                <span class="label label-danger">False</span>
+                <% } %>
+                <a class="pull-right" href=<%= "/reminder/" + reminder.id %>>View</a>
+            </li>
+        <% }) %>
+
+        <% friendReminders.forEach(function (friend) { %>
+            <strong>From <%= friend.name %> (<%= friend.email %>)</strong>
+            <% friend.reminderList.forEach(function (reminder) { %>
+                <li class="list-group-item">
+                    <strong><%= reminder.title %>: </strong>
+                    <%= reminder.description %>
+                    || Remind me: <%= reminder.date_time %>
+                    || Completed:
+                    <% if (reminder.completed == true) { %>
+                    <span class="label label-success">True</span>
+                    <% } else if (reminder.completed == false) { %>
+                    <span class="label label-danger">False</span>
+                    <% } %>
+                    <!-- <a class="pull-right" href=<%= "/reminder/" + reminder.id %>>View</a> -->
+                </li>
+            <% }) %>
+        <% }) %>
+  </ul>
+  
+  </div>

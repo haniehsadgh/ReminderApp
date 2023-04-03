@@ -1,0 +1,26 @@
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+
+
+        <% if(user) { %>
+        <div class="navbar-eader">
+            <a class="navbar-brand" href="#">Reminder List</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/reminder">List All</a></li>
+                <li><a href="/reminder/new">Create</a></li>
+                <li><a href="/friends">Friends</a></li>
+            </ul>
+        </div>
+        <form class="btn btn-logout" action="/logout" method="post">
+            <button>logout</button>
+        </form>
+        <% } %>
+ 
+        <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <a class="navbar-brand2" href="/logout">Log Out</a>
+        </div> -->
+    </div>
+</nav>

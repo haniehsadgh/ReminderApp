@@ -1,0 +1,50 @@
+<div class="container">
+    <h1 class="page-header">Reminders</h1>
+  
+      <ul class="list-group">
+        <li class="list-group-item">
+          <h3><strong><%= reminderItem.title %>: </strong></h3>
+          <h4><%= reminderItem.description %></h4>
+          <h4>Completed:
+            <% if (reminderItem.completed == true) { %> 
+              <span class="label label-success">True</span>
+              <% } else if (reminderItem.completed == false) { %>
+                <span class="label label-danger">False</span>
+                <% } %>
+          </h4>
+          <h4>Remind Me: <br><%= reminderItem.date_time %></h4>
+        </li>
+        <li class="list-group-item">
+          <h3><label for="subtask">Subtasks</label><br></h3>
+          <% if(reminderItem.subtasks) { %>
+            <ul class="list-group" style="list-style: none;"">
+              <% reminderItem.subtasks.forEach(function (sub) { %>
+                <h4><li><input type="radio" id="sub">
+                <%= sub %></li></h4>
+              <% }) %>
+            </ul>
+          <% } %> 
+        </li>
+        <li class="list-group-item">
+          <h3><label for="tag">Tag</label><br></h3>
+          <% if(reminderItem.tag) { %>
+            <ul class="list-group" style="list-style: none;">
+              <% reminderItem.tag.forEach(function (name) { %>
+                <form method="POST" action=<%="/reminder/close/"+ reminderItem.id + "/" +name.tagid %>>
+                  <h4><li><%= name.title %> <button type="submit" id="<%= name.tagid %>" class="btn btn-close">X</button></form></li></h4>
+              <% }) %>
+            </ul>
+          <% } %> 
+          <form>
+            <button class="btn btn-warning"><a class="btn btn-warning" href=<%= "/reminder/" + reminderItem.id + "/tag" %>>Add Tag</a></button>
+            <button class="btn btn-warning"><a class="btn btn-warning" href=<%= "/reminder/" + reminderItem.id + "/subtask" %>>Add Subtask</a></button>
+            <button class="btn btn-warning"><a class="btn btn-warning" href=<%= "/reminder/" + reminderItem.id + "/edit" %>>Edit</a></button>
+          </form>
+          <form class="deleteForm "method="POST" action=<%= "/reminder/delete/" + reminderItem.id %>>
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </li>     
+      </ul>
+  
+  </div>
+  

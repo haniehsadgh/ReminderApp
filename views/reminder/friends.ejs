@@ -1,0 +1,31 @@
+<div class="container">
+  <h1 class="page-header">Friends</h1>
+
+    <form action="/friends" method="POST">
+      <div class="form-group">
+        <label for="email">Find friends by email address:</label>
+        <input type="text" class="form-control" id="emailInput" placeholder="Email" name="email">
+      </div>
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+    <% if (addError != null) { %>
+      <strong><%= addError %></strong>
+    <% } %>
+
+    <div>
+      <h2>Friends list</h2>
+      <% if (friends[0] != undefined) { %>
+        <ul class="list-group">
+        <% friends.forEach(function (friend) { %>
+            <li class="list-group-item">
+                <%= friend %>
+            </li>
+        <% }) %>
+        </ul>
+      <% } else { %>
+        <strong>No friends found</strong>
+      <% } %>
+    </div>
+
+</div>
+  
