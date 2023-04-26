@@ -1,64 +1,157 @@
-const lrCache = {}
-const lazyRequire = (path, subkey) => {
-  const module = lrCache[path] || (lrCache[path] = require(path))
-  return subkey ? module[subkey] : module
-}
+const express = require("express")
+const session = require("express-session");
+const ejsLayouts = require("express-ejs-layouts");
+const reminderController = require("./controllers/reminder_controller");
+const socialController = require("./controllers/socialController");
+const reminder = require("./controllers/userController");
 
-const lazyExport = (key, path, subkey) => {
-  Object.defineProperty(exports, key, {
-    get: () => {
-      const res = lazyRequire(path, subkey)
-      Object.defineProperty(exports, key, {
-        value: res,
-        enumerable: true,
-        configurable: true
-      })
-      return res
-    },
-    configurable: true,
-    enumerable: true
-  })
-}
 
-lazyExport('re', './internal/re', 're')
-lazyExport('src', './internal/re', 'src')
-lazyExport('tokens', './internal/re', 't')
-lazyExport('SEMVER_SPEC_VERSION', './internal/constants', 'SEMVER_SPEC_VERSION')
-lazyExport('SemVer', './classes/semver')
-lazyExport('compareIdentifiers', './internal/identifiers', 'compareIdentifiers')
-lazyExport('rcompareIdentifiers', './internal/identifiers', 'rcompareIdentifiers')
-lazyExport('parse', './functions/parse')
-lazyExport('valid', './functions/valid')
-lazyExport('clean', './functions/clean')
-lazyExport('inc', './functions/inc')
-lazyExport('diff', './functions/diff')
-lazyExport('major', './functions/major')
-lazyExport('minor', './functions/minor')
-lazyExport('patch', './functions/patch')
-lazyExport('prerelease', './functions/prerelease')
-lazyExport('compare', './functions/compare')
-lazyExport('rcompare', './functions/rcompare')
-lazyExport('compareLoose', './functions/compare-loose')
-lazyExport('compareBuild', './functions/compare-build')
-lazyExport('sort', './functions/sort')
-lazyExport('rsort', './functions/rsort')
-lazyExport('gt', './functions/gt')
-lazyExport('lt', './functions/lt')
-lazyExport('eq', './functions/eq')
-lazyExport('neq', './functions/neq')
-lazyExport('gte', './functions/gte')
-lazyExport('lte', './functions/lte')
-lazyExport('cmp', './functions/cmp')
-lazyExport('coerce', './functions/coerce')
-lazyExport('Comparator', './classes/comparator')
-lazyExport('Range', './classes/range')
-lazyExport('satisfies', './functions/satisfies')
-lazyExport('toComparators', './ranges/to-comparators')
-lazyExport('maxSatisfying', './ranges/max-satisfying')
-lazyExport('minSatisfying', './ranges/min-satisfying')
-lazyExport('minVersion', './ranges/min-version')
-lazyExport('validRange', './ranges/valid')
-lazyExport('outside', './ranges/outside')
-lazyExport('gtr', './ranges/gtr')
-lazyExport('ltr', './ranges/ltr')
-lazyExport('intersects', './ranges/intersects')
+
+// returns a web server so we could use
+const app = express(); 
+
+app.use(express.static(__dirname + "/public"));
+app.use(
+    session({
+      secret: "secret",
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+      },
+    })
+  );
+const passport = require("./middleware/passport");
+// this allows express to get the user's data from form and put it in the webserver
+// use it everywhere 
+app.use(express.urlencoded({extended: false}))
+app.use(ejsLayouts);
+app.use(passport.initialize());
+app.use(passport.session());
+app.set("view engine", "ejs");
+
+app.use((req, res, next) => {
+    res.locals.user = req.user;
+    next();
+})
+// case 1: user goes to localhost:8080 -> hompage/marketing page
+app.get("/", function(req, res) {
+    res.send("Welcome to our landing page. Marketing content goes here")
+})
+
+app.get("/login", reminder.login)
+
+app.post("/login",  passport.authenticate("local", {
+    successRedirect: "/reminder",
+    failureRedirect: "/login",
+  }))
+
+app.post('/logout', reminder.logout);
+// casw 2: user goes to localost:8080/remincer -> show list of reminders
+app.get("/reminder", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.list)
+
+// case 3: user goes to localhost:8081/reminder/new -> show a create reminder page
+app.get("/reminder/new", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.new)
+
+// case 4: user sends new reminder data to us (creating a reminder) 
+app.post("/reminder", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.create)
+
+// case 5: user wants to SEE an individual reminder
+app.get("/reminder/:id", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.listOne)
+
+// case 6: user wants to edit an individual reminder
+app.get("/reminder/:id/edit", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.edit)
+
+// case 6.5: create subtask
+app.get("/reminder/:id/subtask", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.subtask)
+
+// case 6.6: add the dubtask
+app.post("/reminder/:id/subtask", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.add)
+
+// case 6.7: create tag
+app.get("/reminder/:id/tag", reminderController.tag)
+
+// case 6.8: add the tag
+app.post("/reminder/:id/tag", reminderController.addtag)
+
+// case 7: user clicks the update button from case 6 and expects their reminder to be updated
+app.post("/reminder/:id/edit", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.update)
+
+// case 8: user clicks the delete button and weexpect the reminder to be delited
+app.post("/reminder/delete/:id", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.delete)
+  
+app.post("/reminder/close/:id/:tagid", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.close)
+
+// case 9: user goes to the friends page
+app.get("/friends", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, socialController.list)
+
+// case 10: user adds a friend 
+app.post("/friends", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, socialController.findAndAddFriend)
+
+// to acess server we need to go to this url:
+// localhost:8081
+app.listen(8081, () => {
+  console.log(`🚀 Server has started on port 8081`);
+});
