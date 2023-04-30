@@ -2,7 +2,7 @@ let Database = require("../database").userModel
 var myid = 0
 let reminderController = {
     list: function(req, res) {
-        console.log(req.user);
+        // console.log(req.user);
         // let reminders = GetRemindersFromDatabase()
         const user = Database.findOne(req.user.email)
         let friendReminders = []
@@ -28,15 +28,22 @@ let reminderController = {
         let userData = req.body
         // returns a dictionary containing the user's inputed data
         const user = Database.findOne(req.user.email)
-        console.log(userData)
+        // console.log(userData)
         let reminder = {
-            // id: myid++,
             id: user.reminders.length + 1, // Database.cindy.reminders.lenght == 0 + 1 = 1 then 2, ...
             title: req.body.title,
             date_time: req.body.datetime,
             description: req.body.description,
             completed: false
         }
+        // for(let key in reminder){
+        //     console.log(reminder[key].length)
+        //     // if((reminder[key]).length == 0){
+        //     //     window.alert("None of the fields can be empty")
+
+        //     // }else{
+        //         // }
+        //     }
         user.reminders.push(reminder)
         res.redirect("/reminder")
     },
@@ -47,7 +54,7 @@ let reminderController = {
         let searchResult = user.reminders.find(function(reminder) { 
             return reminder.id == reminderToFind
         })
-        console.log(searchResult)
+        // console.log(searchResult)
         if(searchResult) {
             res.render("reminder/single-reminder", {reminderItem: searchResult})
         }
@@ -181,57 +188,32 @@ let reminderController = {
     close: function(req, res) {
         let reminderToFind = req.params.id
         let tagtofind = req.params.tagid
-        console.log("tag id", tagtofind)
-        console.log("reminder id", reminderToFind)
         const user = Database.findOne(req.user.email)
         let searchResult = user.reminders.findIndex((reminder) => reminder.id == req.params.id)
         let searchtag = user.reminders[searchResult]["tag"].findIndex((tagn) => tagn.tagid == req.params.tagid)
         let taglist = user.reminders[searchResult]["tag"]
-        console.log("tag list", taglist)
-        console.log("search", searchResult)
-        console.log("seach tag", searchtag)
-        // let id = get the id of the butty
-        // let gettag = document.getElementById()
+
         if(searchResult != undefined){
-            // if(user.reminders.tag)
-            // for (i in Range(taglist.length)) {
 
-            // }
             taglist.splice(searchtag,1)
-            // console.log("1",user.reminders[searchResult]["tag"][0])
-
             console.log("2",user.reminders[searchResult]["tag"])
-            // user.reminders[searchResult]["tag"][0].remove()
             res.redirect("/reminder/"+reminderToFind)
         }
+    },
+    export: function(req, res) {
+        const user = Database.findOne(req.user.email)
+        const { jsPDF } = require("jspdf");
+        const doc = new jsPDF({ putOnlyUsedFonts: true, orientation: "landscape" });
+        // for( let key of user.reminders){
+        //     exported.push(user.reminders[key])
+        //     // exported.push(user.reminders[key])
+        // }
+        // console.log(exported)
+        doc.text(JSON.stringify(user.reminders), 10, 10);
+        // doc.text(exported, 10, 10)
+        doc.save("list-of-reminders.pdf")
+        res.redirect('/reminder');
     }
-    // close: function(req, res) {
-    //     let reminderToFind = req.params.id
-    //     console.log("which tag", reminderToFind)
-    //     const user = Database.findOne(req.user.email)
-    //     console.log(user.reminders)
-    //     let searchResult = user.reminders.findIndex((reminder) => reminder.id == req.params.id)
-    //     console.log("search", searchResult)
-    //     console.log("what the problem?", user.reminders[searchResult])
-    //     let searchtag = user.reminders[searchResult]["tag"].findIndex((tagn) => tagn.id == reminderToFind)
-    //     let taglist = user.reminders[searchResult]["tag"]
-    //     console.log("search tag", searchtag)
-    //     console.log("tag list", taglist)
-    //     // let id = get the id of the butty
-    //     // let gettag = document.getElementById()
-    //     if(searchResult != undefined){
-    //         // if(user.reminders.tag)
-    //         // for (i in Range(taglist.length)) {
-
-    //         // }
-    //         taglist.splice(searchtag,1)
-    //         // console.log("1",user.reminders[searchResult]["tag"][0])
-
-    //         console.log("2",user.reminders[searchResult]["tag"])
-    //         // user.reminders[searchResult]["tag"][0].remove()
-    //         res.redirect("/reminder/"+reminderToFind)
-    //     }
-    // }
 }
 
 

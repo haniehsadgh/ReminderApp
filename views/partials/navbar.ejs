@@ -7,6 +7,10 @@
             <a class="navbar-brand" href="#">Reminder List</a>
         </div>
 
+        <!-- <div class="navbar-eader">
+            <a class="navbar-export" href="export">Export</a>
+        </div> -->
+
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li><a href="/reminder">List All</a></li>
@@ -16,6 +20,10 @@
         </div>
         <form class="btn btn-logout" action="/logout" method="post">
             <button>logout</button>
+        </form>
+        
+        <form class="btn btn-export" action="/export" method="post">
+            <button>Export</button>
         </form>
         <% } %>
  

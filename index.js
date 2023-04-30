@@ -150,6 +150,15 @@ app.post("/friends", (req, res, next) => {
     res.redirect("/login");
   }}, socialController.findAndAddFriend)
 
+// case 11: export button
+app.post("/export", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/login");
+  }}, reminderController.export)
+
+
 // to acess server we need to go to this url:
 // localhost:8081
 app.listen(8081, () => {
